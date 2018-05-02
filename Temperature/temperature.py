@@ -67,7 +67,7 @@ def savgol_filter(y, window_size, order, deriv=0, rate=1):
     return np.convolve(m[::-1], y, mode='valid')
 
 
-temp_threshold = 73
+temp_threshold = 78
 
 
 def request_handler(request):

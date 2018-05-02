@@ -1,17 +1,17 @@
-import sqlite3
-import datetime
-from bokeh.plotting import figure, output_file, show
+from bokeh.plotting import figure
 from bokeh.models import HoverTool
 from bokeh.embed import components
-import numpy as np
 from math import factorial
+import sqlite3
+import datetime
+import numpy as np
 import sys
 
 sys.path.append('__HOME__/final_project/')  # changes the directory so that I can call other python scripts
 import alerts
 
-example_db = "__HOME__/final_project/temperature.db"  # just come up with name of database
-# example_db = "temperature.db"  # just come up with name of database
+# example_db = "__HOME__/final_project/temperature.db"  # just come up with name of database
+example_db = "temperature.db"  # just come up with name of database
 
 
 def db_create():
@@ -55,7 +55,7 @@ def savgol_filter(y, window_size, order, deriv=0, rate=1):
     if window_size < order + 2:
         raise TypeError("window_size is too small for the polynomials order")
     order_range = range(order+1)
-    half_window = (window_size -1) // 2
+    half_window = (window_size - 1) // 2
     # pre-compute coefficients
     b = np.mat([[k**i for i in order_range] for k in range(-half_window, half_window+1)])
     m = np.linalg.pinv(b).A[deriv] * rate**deriv * factorial(deriv)
@@ -126,6 +126,6 @@ def request_handler(request):
 
 
 # db_create()
-# db_insert(70)
-#
+db_insert(70)
+print(db_lookup())
 # request_handler({"method": "POST", "values": {"temp": 74}})

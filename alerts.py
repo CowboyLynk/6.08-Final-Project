@@ -1,15 +1,15 @@
 
 
-def alert_all(temp_thresh):
-    send_email('lynk.cowboy@gmail.com', temp_thresh)
+def alert_all():
+    send_email('fish.alert@mit.edu')
 
 
-def send_email(to, temp_thresh):
+def send_email(to):
     import smtplib
 
     TO = to
     SUBJECT = 'F.I.S.H. Alert!'
-    TEXT = 'Your fish tank has reached a temperature of above {} degrees F'.format(temp_thresh)
+    TEXT = 'Your fish tank has an issue. Check it out.'
 
     # Gmail Sign In
     gmail_sender = 'fish.alert.manager@gmail.com'

@@ -82,5 +82,3 @@ for x in range(100):  # pick a 100 datapoints
     db_insert(Tables(3), y3)
     db_insert(Tables(4), y4)
 
-
-# request_handler({"method": "POST", "values": {"temp": 74}})

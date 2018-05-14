@@ -144,6 +144,16 @@ def make_html(table):
     return output
 
 
+def make_alert(l, low, high):
+    if not (low <= float(l[-1][0]) <= high):  # if the most recent one is not in the range!!!
+        for i in range(0, 3):  # if we've alerted for any of the past 3 entries
+            if not (low <= float(l[i][0]) <= high):  # if something is not in the range, we've already alerted
+                return False
+        return True
+    else:  # we're all good :)
+        return False
+
+
 def request_handler(request):
     if request["method"] == "GET":  # this means that the user is requesting the webpage
         table = request["values"].get("table", 1)
@@ -153,26 +163,23 @@ def request_handler(request):
         sensor = Tables(int(request["values"]["sensor"]))
         db_insert(sensor, value)
 
-        alert = False
+        ph_alert, temp_alert, level_alert, turbidity_alert = False, False, False, False
 
-        if sensor == Tables.ph:
-            if not ph_low <= value <= ph_high:
-                alert = True
-        elif sensor == Tables.temperature:
-            if not temperature_low <= value <= temperature_high:
-                alert = True
-        elif sensor == Tables.waterlevel:
-            if waterlevel <= value:
-                alert = True
+        if sensor == Tables.temperature:
+            temps = db_lookup(Tables(1))[-4:]
+            temp_alert = make_alert(temps, temperature_low, temperature_high)
         elif sensor == Tables.turbidity:
-            if turbidy_low >= value:
-                alert = True
+            turbidity = db_lookup(Tables(2))[-4:]
+            turbidity_alert = make_alert(turbidity, turbidy_low, float("inf"))
+        elif sensor == Tables.waterlevel:
+            levels = db_lookup(Tables(3))[-4:]
+            level_alert = make_alert(levels, waterlevel, float("inf"))
+        else:
+            phs = db_lookup(Tables(4))[-4:]
+            ph_alert = make_alert(phs, ph_low, ph_high)
 
-        if not ph_low <= float(db_lookup(Tables(4))[-1:][0][0]) <= ph_high or not temperature_low <= float(db_lookup(Tables(1))[-1:][0][0]) <= temperature_high or waterlevel <= float(db_lookup(Tables(3))[-1:][0][0]) or  turbidy_low >= float(db_lookup(Tables(2))[-1:][0][0]):
-            alert = True
-
-        if alert:
-            alerts.alert_all(temperature_high)
+        if any([ph_alert, temp_alert, level_alert, turbidity_alert]):
+            alerts.alert_all()
             return "ON"
         return "OFF"
 

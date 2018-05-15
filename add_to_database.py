@@ -70,15 +70,15 @@ try:
     db_create()
 except:
     pass
-for x in range(100):  # pick a 100 datapoints
-    rand = random.randint(-10, 10)
-    y = 85 + 30*math.sin(x/30) + rand
-    y2 = random.randint(0, 100)
-    y3 = 30 + -1*x + rand/2
-    y4 = y2
-
-    db_insert(Tables(1), y)
-    db_insert(Tables(2), y2)
-    db_insert(Tables(3), y3)
-    db_insert(Tables(4), y4)
+# for x in range(100):  # pick a 100 datapoints
+#     rand = random.randint(-10, 10)
+#     y = 85 + 30*math.sin(x/30) + rand
+#     y2 = random.randint(0, 100)
+#     y3 = 30 + -1*x + rand/2
+#     y4 = y2
+#
+#     db_insert(Tables(1), y)
+#     db_insert(Tables(2), y2)
+#     db_insert(Tables(3), y3)
+#     db_insert(Tables(4), y4)
 

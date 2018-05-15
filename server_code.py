@@ -1,5 +1,6 @@
 import sqlite3
 import datetime
+import requests
 from bokeh.plotting import figure
 from bokeh.models import HoverTool, LinearColorMapper
 from bokeh.embed import components
@@ -112,7 +113,7 @@ def make_html(table):
         x.append(datetime.datetime.strptime(time, "%Y-%m-%d %H:%M:%S.%f"))
         y.append(temp)
     y_prime = np.array(y)
-    y_prime = savgol_filter(y_prime, 51, 3)
+    y_prime = savgol_filter(y_prime, 301, 3)
 
     p = figure(x_axis_type="datetime", plot_width=800, plot_height=300)
 
@@ -168,6 +169,7 @@ def request_handler(request):
         if sensor == Tables.temperature:
             temps = db_lookup(Tables(1))[-4:]
             temp_alert = make_alert(temps, temperature_low, temperature_high)
+            requests.get("http://blynk-cloud.com/e59f25208cd64dd78eb0e6b587bf978f/update/V0", {"value": value})
         elif sensor == Tables.turbidity:
             turbidity = db_lookup(Tables(2))[-4:]
             turbidity_alert = make_alert(turbidity, turbidy_low, float("inf"))
@@ -179,7 +181,7 @@ def request_handler(request):
             ph_alert = make_alert(phs, ph_low, ph_high)
 
         if any([ph_alert, temp_alert, level_alert, turbidity_alert]):
-            alerts.alert_all()
+            # alerts.alert_all()
             return "ON"
         return "OFF"
 

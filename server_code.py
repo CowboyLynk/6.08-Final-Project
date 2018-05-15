@@ -112,18 +112,23 @@ def make_html(table):
         temp, time = entry
         x.append(datetime.datetime.strptime(time, "%Y-%m-%d %H:%M:%S.%f"))
         y.append(temp)
+    if table == 3:  # does fix for water level being inverted
+        y = [24 - x for x in y]
     y_prime = np.array(y)
     y_prime = savgol_filter(y_prime, 301, 3)
 
     p = figure(x_axis_type="datetime", plot_width=800, plot_height=300)
 
-    color_mapper = LinearColorMapper(palette='Magma256', low=min(y), high=max(y))
+    blues = ['#f7fbff', '#deebf7', '#c6dbef', '#9ecae1', '#6baed6', '#4292c6', '#2171b5', '#084594']
+    color_mapper = LinearColorMapper(palette=blues, low=min(y), high=max(y))
 
-    if table == 1:
+    if table == 1:  # temperature
+        p = figure(x_axis_type="datetime", plot_width=800, plot_height=300, y_range=(65, 85))
         color_mapper = LinearColorMapper(palette='Magma256', low=min(y), high=max(y))
-    else:
-        blues = ['#f7fbff', '#deebf7', '#c6dbef', '#9ecae1', '#6baed6', '#4292c6', '#2171b5', '#084594']
-        color_mapper = LinearColorMapper(palette=blues, low=min(y), high=max(y))
+    elif table == 3:
+        p = figure(x_axis_type="datetime", plot_width=800, plot_height=300, y_range=(15, 24))
+    elif table == 4:  # ph
+        p = figure(x_axis_type="datetime", plot_width=800, plot_height=300, y_range=(0, 14))
     p.scatter(x, y, color={'field': 'y', 'transform': color_mapper}, size=12, line_color="#333333")
     p.line(x, y_prime, line_dash="5 7", line_width=2, color='gray')
     # cr = p.circle(x, y, size=20, hover_fill_color="firebrick",

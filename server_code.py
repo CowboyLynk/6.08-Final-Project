@@ -112,13 +112,8 @@ def make_html(table):
     for entry in entries:
         temp, time = entry
         time = datetime.datetime.strptime(time, "%Y-%m-%d %H:%M:%S.%f")
-        if time < time_delta:
-            x.append(time)
-            y.append(temp)
     if table == 3:  # does fix for water level being inverted
         y = [24 - x for x in y]
-    elif table == 2:  # to remove values less than 2 in turbidity graph
-        y = [x for x in y if x >= 2]
     y_prime = np.array(y)
     y_prime = savgol_filter(y_prime, 301, 3)
 

@@ -108,12 +108,17 @@ def make_html(table):
     entries = db_lookup(Tables(table))
     x = []
     y = []
+    time_delta = datetime.datetime.now() - datetime.timedelta(days=1)
     for entry in entries:
         temp, time = entry
-        x.append(datetime.datetime.strptime(time, "%Y-%m-%d %H:%M:%S.%f"))
-        y.append(temp)
+        time = datetime.datetime.strptime(time, "%Y-%m-%d %H:%M:%S.%f")
+        if time < time_delta:
+            x.append(time)
+            y.append(temp)
     if table == 3:  # does fix for water level being inverted
         y = [24 - x for x in y]
+    elif table == 2:  # to remove values less than 2 in turbidity graph
+        y = [x for x in y if x >= 2]
     y_prime = np.array(y)
     y_prime = savgol_filter(y_prime, 301, 3)
 
@@ -125,12 +130,14 @@ def make_html(table):
     if table == 1:  # temperature
         p = figure(x_axis_type="datetime", plot_width=800, plot_height=300, y_range=(65, 85))
         color_mapper = LinearColorMapper(palette='Magma256', low=min(y), high=max(y))
+    elif table == 2:
+        p = figure(x_axis_type="datetime", plot_width=800, plot_height=300, y_range=(1.5, 3.5))
     elif table == 3:
         p = figure(x_axis_type="datetime", plot_width=800, plot_height=300, y_range=(15, 24))
     elif table == 4:  # ph
         p = figure(x_axis_type="datetime", plot_width=800, plot_height=300, y_range=(0, 14))
-    p.scatter(x, y, color={'field': 'y', 'transform': color_mapper}, size=12, line_color="#333333")
-    p.line(x, y_prime, line_dash="5 7", line_width=2, color='gray')
+    p.scatter(x, y, color={'field': 'y', 'transform': color_mapper}, size=12, line_color="#333333", line_alpha=0.1)
+    p.line(x, y_prime, line_dash="5 7", line_width=2, color='back', line_color="white")
     # cr = p.circle(x, y, size=20, hover_fill_color="firebrick",
     #               fill_alpha=0.2, hover_alpha=0.6,
     #               line_color=None, hover_line_color="white")
@@ -174,7 +181,6 @@ def request_handler(request):
         if sensor == Tables.temperature:
             temps = db_lookup(Tables(1))[-4:]
             temp_alert = make_alert(temps, temperature_low, temperature_high)
-            requests.get("http://blynk-cloud.com/e59f25208cd64dd78eb0e6b587bf978f/update/V0", {"value": value})
         elif sensor == Tables.turbidity:
             turbidity = db_lookup(Tables(2))[-4:]
             turbidity_alert = make_alert(turbidity, turbidy_low, float("inf"))
